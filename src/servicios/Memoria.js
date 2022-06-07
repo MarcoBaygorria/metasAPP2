@@ -38,10 +38,36 @@ const estadoInicial = {
     objetos: {}
 };
 
+function reductor(estado, accion) {
+    switch (accion.tipo) {
+        case 'colocar': {
+            const metas = accion.metas;
+            const nuevoEstado = {
+                orden: metas.map(meta => meta.id),
+                objetos: metas.reduce((objeto, meta) => ({ ...objeto, [meta.id]: meta}), {})
+            };
+            return nuevoEstado;
+        };
+        case 'crear': {
+            const id = Math.random(); // accion.meta.id;
+            const nuevoEstado = {
+                orden: [...estado.orden, id],
+                objetos: {
+                    ...estado.objetos,
+                    [id]: accion.meta
+                }
+            };
+            return nuevoEstado;
+        };
+    }
+}
+
+const metas = reductor(estadoInicial, {tipo: 'colocar', metas: listaMock});
+
 export const Contexto = createContext(null);
 
 function Memoria({ children }) {
-    const [estado, enviar] = useReducer(reductor, estadoInicial);
+    const [estado, enviar] = useReducer(reductor, metas);
     return (
         <Contexto.Provider value={[estado, enviar]}>
             {children}
