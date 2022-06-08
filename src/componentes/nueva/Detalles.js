@@ -1,9 +1,11 @@
 import { useEffect, useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Contexto } from "../../servicios/Memoria";
 import estilos from "./Detalles.module.css";
 
 function Detalles() {
+
+    const {id} = useParams();
 
     const [form, setForm] = useState({
         detalles: '',
@@ -23,16 +25,33 @@ function Detalles() {
         setForm(estado => ({ ...estado, [prop]: event.target.value }));
     }
 
-    useEffect(() => {
-        //console.log(form);
-    }, [form])
-
     const navegar = useNavigate();
 
+    useEffect(() => {
+        const metaMemoria = estado.objetos[id];
+        if (!id) return;    
+        if ( !metaMemoria) {
+            return navegar('/404');
+        }
+        setForm(metaMemoria);
+    }, [id]);
 
-    const crear = async () => {
-        //console.log(form);
+    const crear = () => {
         enviar({ tipo: 'crear', meta: form});
+        navegar('/lista');
+    }
+
+    const actualizar = () => {
+        enviar({ tipo: 'actualizar', meta: form});
+        navegar('/lista');
+    }
+
+    const borrar = () => {
+        enviar({ tipo: 'borrar', id });
+        navegar('/lista');
+    }
+
+    const cancelar = () => {
         navegar('/lista');
     }
 
@@ -108,11 +127,22 @@ function Detalles() {
                 </label>
             </form>
             <div className={estilos.botones}>
-                <button 
+                {!id && <button 
                     className="boton boton--negro"
                     onClick={crear}
-                >Crear</button>
-                <button className="boton boton--gris">Cancelar</button>
+                >Crear</button>}
+                {id && <button 
+                    className="boton boton--negro"
+                    onClick={actualizar}
+                >Actualizar</button>}
+                {id && <button 
+                    className="boton boton--rojo"
+                    onClick={borrar}
+                >Borrar</button>}
+                <button 
+                    className="boton boton--gris"
+                    onClick={cancelar}
+                >Cancelar</button>
             </div>
         </div>
     );
