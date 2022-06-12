@@ -13,11 +13,12 @@ function App() {
 
   const [, enviar] = useContext(Contexto);
 
-  useEffect(async () => {
-    const metas = await pedirMetas();
-    enviar({ tipo: 'colocar', metas });
-  }, []);
-
+  useEffect(() => {
+    pedirMetas()
+    .then(metas => enviar({ tipo: 'colocar', metas }))
+    .catch(error => console.log(error))
+  }, [enviar]);
+  
   return (
     <Routes>
       <Route path="/" element={<Layout />} >
